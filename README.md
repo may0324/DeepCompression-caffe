@@ -15,10 +15,10 @@ For a better understanding, please see the examples/mnist and run the demo scrip
 # Run LeNet Compressing Demo
 
 ```
-$shell
+$Bash
 ```
 
-```python
+```Bash
 # clone repository and make 
 $ git clone https://github.com/may0324/DeepCompression-caffe.git
 $ cd DeepCompression-caffe
