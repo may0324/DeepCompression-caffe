@@ -11,7 +11,7 @@ After all layers are properly pruned, weight quantization are done on all layers
 The final accuracy of finetuned model is about 99.06%, you can check if the weights are most pruned and weight-shared for sure.
 Enjoy!
 
-Please refer to for more. 
+Please refer to http://blog.csdn.net/may0324/article/details/52935869 for more. 
 """
 
 
