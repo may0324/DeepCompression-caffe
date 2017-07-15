@@ -10,7 +10,7 @@ The params that controlls the sparsity including:<br>
 * class_num: the numbers of k-means for weight quantization<br>
 * quantization_term: whether to set quantization on <br>
 
-For a better understanding, please see the examples/mnist and run the demo script, which we automatically compress a pretrained MNIST　LeNet caffemodel.
+For a better understanding, please see the examples/mnist and run the demo script, which automatically compresses a pretrained MNIST LeNet caffemodel.
 
 # Run LeNet Compressing Demo
 
@@ -29,6 +29,26 @@ $ python examples/mnist/train_compress_lenet.py
 
 ```
 
+# Details 
+the sparse parameters of lenet are set based on the paper as follows:<br>
+---------------------------------------------  <br>
+|layer_name | sparse_ratio | quantization_num| <br>
+---------------------------------------------  <br>
+|   conv1   |     0.33     |       256       | <br>
+---------------------------------------------  <br>
+|   conv2   |     0.8      |       256       | <br>
+---------------------------------------------  <br>
+|    fc1    |     0.9      |       32        | <br>
+---------------------------------------------  <br>
+|    fc2    |     0.8      |       32        | <br>
+---------------------------------------------  <br>
 
+In practice, the layers are much more sensitive to weight prunning than weight quantization. <br>
+So we suggest to do weight prunning layer-wisely 
+and do weight quantization finally since it almost does no harm to accuary. <br>
+In the script demo, we set the sparse ratio (the ratio of pruned weights) layer-wisely and do each finetuning iteration.
+After all layers are properly pruned, weight quantization are done on all layers simultaneously. <br>
+The final accuracy of finetuned model is about 99.06%, you can check if the weights are most pruned and weight-shared for sure.<br>
 
+Enjoy! 
 
