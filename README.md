@@ -32,10 +32,10 @@ $ python examples/mnist/train_compress_lenet.py
 # Details 
 the sparse parameters of lenet are set based on the paper as follows:<br>
 
-| layer name      | sparse ratio                  |  quantization num                   |
+|    layer name   |      sparse ratio     |           quantization num              |
 | :------------- |:-------------:| :-----:|
-| conv1:          |               0.33               |                256               |
-| conv2:          |               0.8                |                256               |
+| conv1           |               0.33               |                256               |
+| conv2           |               0.8                |                256               |
 | fc1             |               0.9                |                32                |
 | fc2             |               0.8                |                32                |    
 
