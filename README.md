@@ -12,7 +12,7 @@ The params that controlls the sparsity including:<br>
 
 For a better understanding, please see the examples/mnist and run the demo script, which automatically compresses a pretrained MNIST LeNet caffemodel.
 
-# Run LeNet Compressing Demo
+# Run LeNet Compression Demo
 
 ```
 $Bash
