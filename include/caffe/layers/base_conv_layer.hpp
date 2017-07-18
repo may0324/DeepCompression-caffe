@@ -82,6 +82,10 @@ class BaseConvolutionLayer : public Layer<Dtype> {
   vector<int> col_buffer_shape_;
   /// @brief The spatial dimensions of the output.
   vector<int> output_shape_;
+  /// temp variables for weight quantization.
+  Blob<Dtype> tmpDiff_;
+  Blob<int> freq_;
+
   const vector<int>* bottom_shape_;
 
   int num_spatial_axes_;

@@ -47,6 +47,11 @@ class CmpInnerProductLayer : public Layer<Dtype> {
   bool bias_term_;
   Blob<Dtype> bias_multiplier_;
   bool transpose_;  ///< if true, assume transposed weights
+  
+  ///temp variables for weight quantization
+  Blob<Dtype> tmpDiff_;
+  Blob<int> freq_;
+
 
   //sparse parameters
   float sparse_ratio_;

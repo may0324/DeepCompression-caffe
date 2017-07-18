@@ -20,7 +20,7 @@ void CmpConvolutionLayer<Dtype>::ComputeBlobMask()
 
   //calculate min max value of weight
   const Dtype* weight = this->blobs_[0]->cpu_data();
-  Dtype min_weight = weight[0] , max_weight = weight[0];
+  //Dtype min_weight = weight[0] , max_weight = weight[0];
   vector<Dtype> sort_weight(count);
                
   for (int i = 0; i < count; ++i)
@@ -31,13 +31,14 @@ void CmpConvolutionLayer<Dtype>::ComputeBlobMask()
 
   sort(sort_weight.begin(), sort_weight.end());
   
-  max_weight = sort_weight[count - 1];
+  //max_weight = sort_weight[count - 1];
   
   float ratio = this->sparse_ratio_;
 
   int index = int(count*ratio) ; //int(count*(1- max_weight)) ;
   Dtype thr ;
   Dtype* muweight = this->blobs_[0]->mutable_cpu_data();
+  int *mask_data = this->masks_.mutable_cpu_data();
   float rat = 0;
   if(index > 0){
 
@@ -48,19 +49,17 @@ void CmpConvolutionLayer<Dtype>::ComputeBlobMask()
 
     for (int i = 0; i < count; ++i)
     {
-	this->masks_[i] = ((weight[i] > thr || weight[i] < -thr) ? 1 : 0) ;
-        //this->masks_[i] = (weight[i] > thr ? 1 : 0);//(weight[i]==0 ? 0 :1) ;//(weight[i] > thr ? 1 : 0);
-        muweight[i] *= this->masks_[i];
-        //this->dmasks_[i] = this->masks_[i] ;
-        rat += (1-this->masks_[i]) ;
+	mask_data[i] = ((weight[i] > thr || weight[i] < -thr) ? 1 : 0) ;
+        muweight[i] *= mask_data[i];
+        rat += (1-mask_data[i]) ;
      }
    
   }
   else {
       for (int i = 0; i < count; ++i)
       {
-          this->masks_[i] = (weight[i]==0 ? 0 :1); //keep unchanged
-	  rat += (1-this->masks_[i]) ;
+          mask_data[i] = (weight[i]==0 ? 0 :1); //keep unchanged
+	  rat += (1-mask_data[i]) ;
       }
   }
    LOG(INFO) << "sparsity: "<< rat/count <<endl;
@@ -68,7 +67,7 @@ void CmpConvolutionLayer<Dtype>::ComputeBlobMask()
   if(this->quantize_term_)
   {
     int nCentroid = this->class_num_;
-    kmeans_cluster(this->indices_, this->centroids_, muweight, count, this->masks_,/* max_weight, min_weight,*/ nCentroid, 1000);
+    kmeans_cluster(this->indices_.mutable_cpu_data(), this->centroids_.mutable_cpu_data(),  muweight, count, mask_data/*this->masks_*/,/* max_weight, min_weight,*/ nCentroid, 1000);
   }
 }
 template <typename Dtype>
@@ -92,17 +91,20 @@ template <typename Dtype>
 void CmpConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   Dtype* muweight = this->blobs_[0]->mutable_cpu_data();
+  const int *mask_data = this->masks_.cpu_data();
   int count = this->blobs_[0]->count();
   //vector<Dtype> sort_weight(count);
   for (int i = 0; i < count; ++i)
-    muweight[i] *= this->masks_[i] ;
-
+    muweight[i] *= mask_data[i] ;
+  
   if(this->quantize_term_)
   {
+    const Dtype *cent_data = this->centroids_.cpu_data();
+    const int *indice_data = this->indices_.cpu_data();
     for (int i = 0; i < count; ++i)
     {
-       if (this->masks_[i])
-         muweight[i] = this->centroids_[this->indices_[i]];
+       if (mask_data[i])
+         muweight[i] = cent_data[indice_data[i]];
     }
   }
   const Dtype* weight = this->blobs_[0]->cpu_data();
@@ -123,7 +125,7 @@ void CmpConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void CmpConvolutionLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
- LOG(INFO) << "conv backward" << endl;
+ //LOG(INFO) << "conv backward" << endl;
   const Dtype* weight = this->blobs_[0]->cpu_data();
   Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
   int count = this->blobs_[0]->count();
@@ -146,24 +148,28 @@ void CmpConvolutionLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
               top_diff + n * this->top_dim_, weight_diff);
         }
         Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
+        const int *mask_data = this->masks_.cpu_data();
         for (int j = 0; j < count; ++j)
-          weight_diff[j] *= this->masks_[j];
+          weight_diff[j] *=  mask_data[j];
+
         if(this->quantize_term_)
         {
 	  vector<Dtype> tmpDiff(this->class_num_);
           vector<int> freq(this->class_num_);
+          const int *indice_data = this->indices_.cpu_data();
+
           for (int j = 0; j < count; ++j)
           {
-            if (this->masks_[j])
+            if (mask_data[j])
             {
-              tmpDiff[this->indices_[j]] += weight_diff[j];
-              freq[this->indices_[j]]++;
+              tmpDiff[indice_data[j]] += weight_diff[j];
+              freq[indice_data[j]]++;
             }
           }
           for (int j = 0; j < count; ++j)
           {
-            if (this->masks_[j])
-              weight_diff[j] = tmpDiff[this->indices_[j]] / freq[this->indices_[j]];
+            if (mask_data[j])
+              weight_diff[j] = tmpDiff[indice_data[j]] / freq[indice_data[j]];
           }
         }
         // gradient w.r.t. bottom data, if necessary.

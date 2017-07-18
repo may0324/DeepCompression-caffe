@@ -187,13 +187,20 @@ void BaseConvolutionLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     class_num_ = this->layer_param_.convolution_param().class_num();
     quantize_term_ = this->layer_param_.convolution_param().quantize_term();
     int count = this->blobs_[0]->count() ; 
-    this->masks_.resize(count);
-    for(int i = 0; i< count; ++i)
-	this->masks_[i] = 1;
+    vector<int> mask_shape(1, count);
+    this->masks_.Reshape(mask_shape);
+    //int* mask_data = this->masks_.mutable_cpu_data();
+    //this->masks_.resize(count);
+    //for(int i = 0; i< count; ++i)
+    //	mask_data[i] = 1;
+    caffe_set(count ,1, this->masks_.mutable_cpu_data());
     if(quantize_term_)
     {
-      this->indices_.resize(count);
-      this->centroids_.resize(class_num_);
+      vector<int> cen_shape(1, class_num_);
+      this->indices_.Reshape(mask_shape);
+      this->centroids_.Reshape(cen_shape);
+      this->tmpDiff_.Reshape(cen_shape);
+      this->freq_.Reshape(cen_shape);
     }
   }
 

@@ -331,11 +331,14 @@ class Layer {
   /** The vector that stores the learnable parameters as a set of blobs. */
   vector<shared_ptr<Blob<Dtype> > > blobs_;
 
-  vector<int> masks_;
+  //vector<int> masks_;
+  Blob<int> masks_;
  
-  vector<int> indices_;
+  Blob<int> indices_;
+  //vector<int> indices_;
 
-  vector<Dtype> centroids_;
+  Blob<Dtype> centroids_;
+  //vector<Dtype> centroids_;
 
   /** Vector indicating whether to compute the diff of each param blob. */
   vector<bool> param_propagate_down_;

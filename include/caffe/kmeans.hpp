@@ -12,7 +12,7 @@
 
 using namespace std;
 template<typename Dtype>
-void kmeans_cluster(vector<int> &cLabel, vector<Dtype> &cCentro, Dtype *cWeights, int nWeights, vector<int> &mask, /*Dtype maxWeight, Dtype minWeight,*/  int nCluster,  int max_iter /* = 1000 */)
+void kmeans_cluster(/*vector<int> &*/int *cLabel, /*vector<Dtype> &*/Dtype *cCentro, Dtype *cWeights, int nWeights, int *mask/*vector<int> &mask*/, /*Dtype maxWeight, Dtype minWeight,*/  int nCluster,  int max_iter /* = 1000 */)
 {
     //find min max
     Dtype maxWeight=numeric_limits<Dtype>::min(), minWeight=numeric_limits<Dtype>::max();
