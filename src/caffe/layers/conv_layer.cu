@@ -52,8 +52,8 @@ void ConvolutionLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
           this->weight_gpu_gemm(bottom_data + n * this->bottom_dim_,
               top_diff + n * this->top_dim_, weight_diff);
         }
-        for(int i = 0; i < count; ++i)
-          weight_diff[i]*=this->masks_[i];
+        //for(int i = 0; i < count; ++i)
+         // weight_diff[i]*=this->masks_[i];
 
         // gradient w.r.t. bottom data, if necessary.
         if (propagate_down[i]) {
