@@ -46,6 +46,10 @@ In the script demo, we set the sparse ratio (the ratio of pruned weights) layer-
 After all layers are properly pruned, weight quantization are done on all layers simultaneously. <br>
 
 The final accuracy of finetuned model is about 99.06%, you can check if the weights are most pruned and weight-shared for sure.<br>
+
+# Model Size
+The size of finetuned model is still the same as the original one since it is stored in 'caffemodel' format. Although most of the weights are pruned and shared, the weights are still stored in float32. You can only store the non-zero weight and cluster center to reduce the redundacy of finetuned model, please refer to the paper.
+
 Please refer to http://blog.csdn.net/may0324/article/details/52935869 for more. <br>
 Enjoy! 
 
