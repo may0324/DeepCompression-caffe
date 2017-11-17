@@ -50,7 +50,7 @@ __global__ void quantize_weight_backward( int n, int class_num, const Dtype* dif
 
           if (mask[index])
           {
-              out[index] = tmpDiff[indice[index]]/freq[indice[index]] ;
+              out[index] = tmpDiff[indice[index]]/(freq[indice[index]] + 1e-6) ;
           }
 
   }
